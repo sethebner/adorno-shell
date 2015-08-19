@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define TRUE    1 
+#define TRUE    1
 #define FALSE   0
 
 #define ALLOCATION_FAILURE          1
