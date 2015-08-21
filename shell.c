@@ -17,12 +17,12 @@
 
 #define array_cnt(x)    ( sizeof( x ) / sizeof( x[0] ) )
 
-typedef struct command
+typedef struct
     {
         int (*function_ptr) (char**);
         char* cmd_string;
         char* help_string;
-    }   command;
+    }   command_type;
 
 // FORWARD DECLARATIONS
 
@@ -73,7 +73,7 @@ int cmd_help
 
 // MEMORY CONSTANTS
 
-static const command commands[] = 
+static const command_type commands[] = 
     {
         {&cmd_back, "b", "change to the parent directory"},
         {&cmd_back_list, "bl", "change to the parent directory and list directory contents"},
