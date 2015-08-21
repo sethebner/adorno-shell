@@ -1,13 +1,7 @@
-#include <readline/history.h>
-#include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <unistd.h>
-
-#define TRUE    1
-#define FALSE   0
 
 #define TRUE    1
 #define FALSE   0
@@ -31,6 +25,11 @@ typedef struct command
     }   command;
 
 // FORWARD DECLARATIONS
+
+int shell_launch
+    (
+        char** args
+    );
 
 int cmd_back
     (
@@ -72,6 +71,8 @@ int cmd_help
         char** args
     );
 
+// MEMORY CONSTANTS
+
 static const command commands[] = 
     {
         {&cmd_back, "b", "change to the parent directory"},
@@ -83,105 +84,6 @@ static const command commands[] =
         {&cmd_exit, "exit", "exit shell"},
         {&cmd_help, "help", "display help"},
     };
-
-char* shell_read_line
-    (
-        void
-    )
-{
-    // Local variables
-    char*   line;
-    size_t  buffer_size;
-
-    // Initialize local variables
-    line        = NULL;
-    buffer_size = 0;
-
-    getline( &line, &buffer_size, stdin );
-
-    return line;
-} /* shell_read_line() */
-
-char** shell_split_line
-    (
-        char* line
-    )
-{
-    // Local variables
-    int     buffer_size;
-    int     position;
-    char**  tokens;
-    char*   token;
-
-    // Initialize local variables
-    buffer_size = SHELL_TOKEN_BUFFER_SIZE;
-    position    = 0;
-    tokens      = malloc( sizeof( char* ) * buffer_size );
-
-    if( !tokens )
-    {
-        fprintf( stderr, "Allocation error\n" );
-        exit( ALLOCATION_FAILURE );
-    }
-
-    token = strtok( line, SHELL_TOKEN_DELIMITERS );
-    while( NULL != token )
-    {
-        tokens[position] = token;
-        position++;
-
-        if( position >= buffer_size )
-        {
-            buffer_size += SHELL_TOKEN_BUFFER_SIZE;
-            tokens = realloc( tokens, sizeof( char* ) * buffer_size );
-
-            if( !tokens )
-            {
-                fprintf( stderr, "Allocation error\n" );
-                exit( ALLOCATION_FAILURE );
-            }
-        }
-
-        token = strtok( NULL, SHELL_TOKEN_DELIMITERS );
-    }
-
-    tokens[position] = NULL;
-    return tokens;
-} /* shell_split_line() */
-
-int shell_launch
-    (
-        char** args
-    )
-{
-    // Local variables
-    pid_t   pid;
-    pid_t   wpid;
-    int     status;
-
-    pid = fork();
-    if( 0 == pid )
-    {
-        if( -1 == execvp( args[0], args ) )
-        {
-            perror( "shell" );
-        }
-        exit( FAILURE );
-    }
-    else if( pid < 0 )
-    {
-        perror( "shell" );
-    }
-    else
-    {
-        do
-        {
-            wpid = waitpid( pid, &status, WUNTRACED );
-        }   while( !WIFEXITED( status ) && !WIFSIGNALED( status ) );
-    }
-
-    return TRUE;
-} /* shell_launch() */
 
 int cmd_back
     (
@@ -286,6 +188,105 @@ int cmd_help
 
     return TRUE;
 } /* cmd_help() */
+
+char* shell_read_line
+    (
+        void
+    )
+{
+    // Local variables
+    char*   line;
+    size_t  buffer_size;
+
+    // Initialize local variables
+    line        = NULL;
+    buffer_size = 0;
+
+    getline( &line, &buffer_size, stdin );
+
+    return line;
+} /* shell_read_line() */
+
+char** shell_split_line
+    (
+        char* line
+    )
+{
+    // Local variables
+    int     buffer_size;
+    int     position;
+    char**  tokens;
+    char*   token;
+
+    // Initialize local variables
+    buffer_size = SHELL_TOKEN_BUFFER_SIZE;
+    position    = 0;
+    tokens      = malloc( sizeof( char* ) * buffer_size );
+
+    if( !tokens )
+    {
+        fprintf( stderr, "Allocation error\n" );
+        exit( ALLOCATION_FAILURE );
+    }
+
+    token = strtok( line, SHELL_TOKEN_DELIMITERS );
+    while( NULL != token )
+    {
+        tokens[position] = token;
+        position++;
+
+        if( position >= buffer_size )
+        {
+            buffer_size += SHELL_TOKEN_BUFFER_SIZE;
+            tokens = realloc( tokens, sizeof( char* ) * buffer_size );
+
+            if( !tokens )
+            {
+                fprintf( stderr, "Allocation error\n" );
+                exit( ALLOCATION_FAILURE );
+            }
+        }
+
+        token = strtok( NULL, SHELL_TOKEN_DELIMITERS );
+    }
+
+    tokens[position] = NULL;
+    return tokens;
+} /* shell_split_line() */
+
+int shell_launch
+    (
+        char** args
+    )
+{
+    // Local variables
+    pid_t   pid;
+    pid_t   wpid;
+    int     status;
+
+    pid = fork();
+    if( 0 == pid )
+    {
+        if( -1 == execvp( args[0], args ) )
+        {
+            perror( "shell" );
+        }
+        exit( FAILURE );
+    }
+    else if( pid < 0 )
+    {
+        perror( "shell" );
+    }
+    else
+    {
+        do
+        {
+            wpid = waitpid( pid, &status, WUNTRACED );
+        }   while( !WIFEXITED( status ) && !WIFSIGNALED( status ) );
+    }
+
+    return TRUE;
+} /* shell_launch() */
 
 int shell_execute
     (
