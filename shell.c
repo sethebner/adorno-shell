@@ -15,6 +15,8 @@
 #define SHELL_TOKEN_DELIMITERS      " \t\r\n\a"
 #define SUCCESS                     0
 
+#define SHELL_NAME  "adorno"
+
 #define array_cnt(x)    ( sizeof( x ) / sizeof( x[0] ) )
 
 typedef struct
@@ -71,7 +73,30 @@ int cmd_help
         char** args
     );
 
+int cmd_list
+    (
+        char** args
+    );
+
+int cmd_vi
+    (
+        char** args
+    );
+
 // MEMORY CONSTANTS
+typedef const enum
+    {
+        CMD_BACK_ID,
+        CMD_BACK_LIST_ID,
+        CMD_CLEAR_ID,
+        CMD_CD_ID,
+        CMD_CD_LIST_ID,
+        CMD_EMACS_ID,
+        CMD_EXIT_ID,
+        CMD_HELP_ID,
+        CMD_LIST_ID,
+        CMD_VI_ID,
+    } command_ids;
 
 static const command_type commands[] = 
     {
@@ -83,6 +108,8 @@ static const command_type commands[] =
         {&cmd_emacs, "e", "launch emacs"},
         {&cmd_exit, "exit", "exit shell"},
         {&cmd_help, "help", "display help"},
+        {&cmd_list, "l", "list directory contents"},
+        {&cmd_vi, "v", "launch vi"},
     };
 
 int cmd_back
@@ -188,6 +215,32 @@ int cmd_help
 
     return TRUE;
 } /* cmd_help() */
+
+int cmd_list
+    (
+        char** args
+    )
+{
+    args[0] = "ls";
+    return shell_launch( args );
+} /* cmd_list() */
+
+int cmd_vi
+    (
+        char** args
+    )
+{
+    if( NULL == args[1] )
+    {
+        fprintf( stderr, "Expected another argument.\n" );
+        return TRUE;
+    }
+    else
+    {
+        args[0] = "vi";
+        return shell_launch( args );
+    }
+} /* cmd_vi() */
 
 char* shell_read_line
     (
@@ -333,7 +386,7 @@ void shell_loop
         {
             printable_cwd++;
         }
-        printf( "adorno::%s> ", printable_cwd );
+        printf( "%s::%s> ", SHELL_NAME, printable_cwd );
 
         line    = shell_read_line();
         args    = shell_split_line( line );
@@ -345,12 +398,21 @@ void shell_loop
 
 } /* shell_loop() */
 
+void shell_intro
+    (
+        void
+    )
+{
+    printf( "Welcome to the %s shell. Type '%s' for a list of commands.\n", SHELL_NAME, commands[CMD_HELP_ID].cmd_string );
+} /* shell_intro() */
+
 int main
     (
     int     argc,
     char**  argv
     )
 {
+    shell_intro();
     shell_loop();
 
     return SUCCESS;
