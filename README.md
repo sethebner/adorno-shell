@@ -9,6 +9,7 @@ as well as some command shortcuts, such as:
 - `c` to clear the screen
 - `e foo` to open `foo` in emacs
 - `l` to list the current directory's contents
+- `s foo` to open `foo` in Sublime Text 2
 - `v foo` to open `foo` in vi
 
 This shell is adapted from Stephen Brennan's shell available [here](https://github.com/brenns10/lsh).

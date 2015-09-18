@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "shell.h"
+
 #define TRUE    1
 #define FALSE   0
 
@@ -19,70 +21,6 @@
 
 #define array_cnt(x)    ( sizeof( x ) / sizeof( x[0] ) )
 
-typedef struct
-    {
-        int (*function_ptr) (char**);
-        char* cmd_string;
-        char* help_string;
-    }   command_type;
-
-// FORWARD DECLARATIONS
-
-int shell_launch
-    (
-        char** args
-    );
-
-int cmd_back
-    (
-        char** args
-    );
-
-int cmd_back_list
-    (
-        char** args
-    );
-
-int cmd_cd
-    (
-        char** args
-    );
-
-int cmd_cd_list
-    (
-        char** args
-    );
-
-int cmd_clear
-    (
-        char** args
-    );
-
-int cmd_emacs
-    (
-        char** args
-    );
-
-int cmd_exit
-    (
-        char** args
-    );
-
-int cmd_help
-    (
-        char** args
-    );
-
-int cmd_list
-    (
-        char** args
-    );
-
-int cmd_vi
-    (
-        char** args
-    );
-
 // MEMORY CONSTANTS
 typedef const enum
     {
@@ -95,6 +33,7 @@ typedef const enum
         CMD_EXIT_ID,
         CMD_HELP_ID,
         CMD_LIST_ID,
+        CMD_SUBLIME_ID,
         CMD_VI_ID,
     } command_ids;
 
@@ -109,6 +48,7 @@ static const command_type commands[] =
         {&cmd_exit, "exit", "exit shell"},
         {&cmd_help, "help", "display help"},
         {&cmd_list, "l", "list directory contents"},
+        {&cmd_sublime_text_2, "s", "launch sublime text 2"},
         {&cmd_vi, "v", "launch vi"},
     };
 
@@ -224,6 +164,25 @@ int cmd_list
     args[0] = "ls";
     return shell_launch( args );
 } /* cmd_list() */
+
+int cmd_sublime_text_2
+    (
+        char** args
+    )
+{
+    if( NULL == args[1] )
+    {
+        fprintf( stderr, "Expected another argument.\n" );
+        return TRUE;
+    }
+    else
+    {
+        args[0] = "open";
+        args[2] = "-a";
+        args[3] = "sublime text 2";
+        return shell_launch( args );
+    }
+} /* cmd_sublime_text_2() */
 
 int cmd_vi
     (
