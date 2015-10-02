@@ -33,6 +33,7 @@ typedef const enum
         CMD_EXIT_ID,
         CMD_HELP_ID,
         CMD_LIST_ID,
+        CMD_OPEN_ID,
         CMD_SUBLIME_ID,
         CMD_VI_ID,
     } command_ids;
@@ -48,6 +49,7 @@ static const command_type commands[] =
         {&cmd_exit, "exit", "exit shell"},
         {&cmd_help, "help", "display help"},
         {&cmd_list, "l", "list directory contents"},
+        {&cmd_open, "o", "open file"},
         {&cmd_sublime_text_2, "s", "launch sublime text 2"},
         {&cmd_vi, "v", "launch vi"},
     };
@@ -164,6 +166,15 @@ int cmd_list
     args[0] = "ls";
     return shell_launch( args );
 } /* cmd_list() */
+
+int cmd_open
+    (
+        char** args
+    )
+{
+    args[0] = "open";
+    return shell_launch( args );
+}
 
 int cmd_sublime_text_2
     (

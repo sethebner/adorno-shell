@@ -80,6 +80,11 @@ int cmd_list
         char** args
     );
 
+int cmd_open
+    (
+        char** args
+    );
+
 int cmd_sublime_text_2
     (
         char** args
